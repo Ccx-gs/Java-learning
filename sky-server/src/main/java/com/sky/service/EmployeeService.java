@@ -8,41 +8,20 @@ import com.sky.result.PageResult;
 
 public interface EmployeeService {
 
-    /**
-     * 员工登录
-     * @param employeeLoginDTO
-     * @return
-     */
-    Employee login(EmployeeLoginDTO employeeLoginDTO);
-//新增员工
-
 
     //新增员工
     void save(EmployeeDTO employeeDTO);
 
-    /**
-     * 分页查询员工信息
-     * @param employeePageQueryDTO
-     * @return
-     */
-
     PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
-    /**
-     * 启用/禁用员工账号
-     * @param status
-     * @param id
-     */
-
+    /*
+                启用/禁用员工账号
+             */
     void startOStop(Integer status, Long id);
-
-    /**
-     * 根据id查询员工信息
-     * @param id
-     * @return
-     */
 
     Employee getById(Long id);
 
     void update(EmployeeDTO employeeDTO);
+
+    Employee login(EmployeeLoginDTO employeeLoginDTO);
 }
