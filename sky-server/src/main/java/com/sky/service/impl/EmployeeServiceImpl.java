@@ -112,7 +112,13 @@ Employee employee = new Employee();
         return new PageResult(total, records);
     }
 
-
-
+@Override
+    public void startOStop(Integer status, Long id) {
+    Employee employee = Employee.builder()
+            .status(status)
+            .id(id)
+            .build();
+    employeeMapper.update(employee);
+}
 }
 

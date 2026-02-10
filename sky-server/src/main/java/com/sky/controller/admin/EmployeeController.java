@@ -102,5 +102,16 @@ public class EmployeeController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 启用、禁用员工
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用、禁用员工账号")
+public Result startOStop(@PathVariable Integer status, Long id) {
+    log.info("启用、禁用员工：status={}, id={}", status, id);
+    employeeService.startOStop(status, id);
+    return Result.success();
+
+}
 
 }
