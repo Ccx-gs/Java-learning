@@ -11,7 +11,7 @@
     </where>
         order by update_time desc
     </select>
-    <update id="update">
+    <update id="update" parameterType="Employee">
 update employee
 <set>
     <if test="name != null">name = #{name},</if>
@@ -25,6 +25,5 @@ update employee
     <if test="updateUser != null">update_user = #{updateUser},</if>
 </set>
 where id = #{id}
-
     </update>
 </mapper>
