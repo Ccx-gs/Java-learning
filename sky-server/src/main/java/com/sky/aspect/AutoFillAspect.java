@@ -63,9 +63,9 @@ public  void autoFillPointCut() {}
             //为4个公共字段赋值
             try {
                 Method setCreateTime = entity.getClass().getDeclaredMethod(SET_CREATE_TIME, LocalDateTime.class);
-                Method setCreateuser = entity.getClass().getDeclaredMethod(SET_CREATE_USER, LocalDateTime.class);
+                Method setCreateuser = entity.getClass().getDeclaredMethod(SET_CREATE_USER, Long.class);
                 Method setUpdateTime = entity.getClass().getDeclaredMethod(SET_UPDATE_TIME, LocalDateTime.class);
-                Method setUpdateUser = entity.getClass().getDeclaredMethod(SET_UPDATE_USER, LocalDateTime.class);
+                Method setUpdateUser = entity.getClass().getDeclaredMethod(SET_UPDATE_USER, Long.class);
 
                 //通过反射调用方法为公共字段赋值
                 setCreateTime.invoke(entity, now);
@@ -79,7 +79,7 @@ public  void autoFillPointCut() {}
             //为2个公共字段赋值
             try {
                 Method setUpdateTime = entity.getClass().getDeclaredMethod(SET_UPDATE_TIME, LocalDateTime.class);
-                Method setUpdateUser = entity.getClass().getDeclaredMethod(SET_UPDATE_USER, LocalDateTime.class);
+                Method setUpdateUser = entity.getClass().getDeclaredMethod(SET_UPDATE_USER, Long.class);
 
                 //通过反射调用方法为公共字段赋值
                 setUpdateTime.invoke(entity, now);
@@ -94,4 +94,3 @@ public  void autoFillPointCut() {}
 
 
 }
-

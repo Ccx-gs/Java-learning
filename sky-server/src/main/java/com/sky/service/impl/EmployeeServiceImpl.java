@@ -72,7 +72,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     //新增员工
     @Override
     public void save(EmployeeDTO employeeDTO) {
-        System.out.println("当前线程的id" + Thread.currentThread().getId());
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
 
