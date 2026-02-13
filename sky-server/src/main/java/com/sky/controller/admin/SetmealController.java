@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/setmeal")
 @Slf4j
@@ -42,5 +44,30 @@ public class SetmealController {
         log.info("套餐分页查询：{}",setmealPageQueryDTO);
         PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+    /**
+     * 套餐起售、停售功能
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("套餐起售、停售功能")
+    public Result startOrStop(@PathVariable Integer status,Long id){
+        log.info("套餐起售、停售功能：{},{}",status,id);
+        setmealService.startOrStop(status,id);
+        return Result.success();
+    }
+    /**
+     * 批量删除套餐
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("套餐的批量删除")
+    public Result delete(@RequestParam List<Long> ids){
+        log.info("套餐的批量删除：{}",ids);
+        if (ids == null || ids.size() == 0) {
+            return Result.error("请选择要删除的套餐");
+        }
+        setmealService.deleteBatch(ids);
+        return Result.success();
     }
 }
