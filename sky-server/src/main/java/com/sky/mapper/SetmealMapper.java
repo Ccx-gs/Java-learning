@@ -36,11 +36,10 @@ public interface SetmealMapper {
     Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
     /**
-     * 套餐起售、停售功能
+     * 修改套餐
      * @param setmeal
      */
     @AutoFill(value = OperationType.UPDATE)
-    @Select("update setmeal set status = #{status} where id = #{id}")
     void update(Setmeal setmeal);
 
     /**
