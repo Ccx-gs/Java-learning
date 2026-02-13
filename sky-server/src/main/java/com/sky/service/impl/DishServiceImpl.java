@@ -150,4 +150,41 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(flavors);
         }
     }
+    /**
+     * 菜品起售、停售功能
+     * @param status
+     * @param id
+     */
+    @Override
+    @Transactional
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        if (status == StatusConstant.DISABLE) {
+            // 如果是停售操作，需要判断当前菜品是否被起售中的套餐关联了
+            Integer count = setmealDishMapper.countByDishIdAndStatus(id);
+            if (count != null && count > 0) {
+                // 当前菜品被起售中的套餐关联了，不能停售
+                throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+            }
+        }
+
+        dishMapper.update(dish);
+    }
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+        return dishMapper.list(dish);
+    }
 }
