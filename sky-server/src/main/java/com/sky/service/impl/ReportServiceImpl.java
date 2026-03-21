@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -173,6 +175,44 @@ public class ReportServiceImpl implements ReportService {
                 .totalOrderCount(totalOrderCount)
                 .validOrderCount(validOrderCount)
                 .orderCompletionRate(orderCompletionRate)
+                .build();
+    }
+
+    /**
+     * 销量排名 Top10 统计
+     *
+     * @param begin 起始时间
+     * @param end   结束时间
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
+        // 1. 转换时间到当天的 00:00:00 和 23:59:59
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        // 2. 查询数据库，获取销量排名前10的菜品/套餐 (这会返回一个对象列表)
+        // 注意：只有状态为“已完成”的订单才算有效销量
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime, Orders.COMPLETED);
+
+        // 3. 准备两个集合分别存放 名字 和 销量
+        List<String> names = new ArrayList<>();
+        List<Integer> numbers = new ArrayList<>();
+
+        // 4. 将查询到的数据拆分到两个集合里
+        for (GoodsSalesDTO goodsSalesDTO : salesTop10) {
+            names.add(goodsSalesDTO.getName());
+            numbers.add(goodsSalesDTO.getNumber());
+        }
+
+        // 也可以用 Stream 流一行搞定（如果你喜欢高级写法）：
+        // List<String> names = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        // List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+
+        // 5. 封装 VO 返回
+        return SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(names, ","))
+                .numberList(StringUtils.join(numbers, ","))
                 .build();
     }
 
