@@ -4,6 +4,7 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -115,4 +116,75 @@ public class ReportServiceImpl implements ReportService {
                 .newUserList(StringUtils.join(newUserList, ","))
                 .build();
         }
-}
+
+    /**
+     * 订单统计方法
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public OrderReportVO orderStatistics(LocalDate begin, LocalDate end) {
+// 1. 组装从 begin 到 end 的日期集合
+        List<LocalDate> dateList = new ArrayList<>();
+        dateList.add(begin);
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+
+        // 2. 准备集合，存放每天的订单总数和有效订单数
+        List<Integer> orderCountList = new ArrayList<>();
+        List<Integer> validOrderCountList = new ArrayList<>();
+
+        // 遍历每一天，去数据库查当天的订单数据
+        for (LocalDate date : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN); // 00:00:00
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);   // 23:59:59.999
+
+            // 查询每天的总订单数 (不限状态)
+            Integer orderCount = getOrderCount(beginTime, endTime, null);
+
+            // 查询每天的有效订单数 (状态为已完成：5)
+            // 注意：苍穹外卖中通常统一定义了常量 Orders.COMPLETED
+            Integer validOrderCount = getOrderCount(beginTime, endTime, Orders.COMPLETED);
+
+            orderCountList.add(orderCount);
+            validOrderCountList.add(validOrderCount);
+        }
+
+        // 3. 计算时间区间内的总订单数量、总有效订单数量
+        // 这里用到你之前熟悉的 Java 8 Stream 流的高级玩法：reduce(求和)
+        Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).orElse(0);
+        Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).orElse(0);
+
+        // 4. 计算订单完成率 (完美避开 0/0 导致 NaN 的坑)
+        Double orderCompletionRate = 0.0;
+        if (totalOrderCount != 0) {
+            // 必须把有效订单转成 double 才能算出小数，否则整除会变成 0
+            orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
+        }
+
+        // 5. 组装 VO 返回给前端
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dateList, ","))
+                .orderCountList(StringUtils.join(orderCountList, ","))
+                .validOrderCountList(StringUtils.join(validOrderCountList, ","))
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(orderCompletionRate)
+                .build();
+    }
+
+    /**
+     * 提取出的私有辅助方法：根据时间区间和状态动态查询订单数量
+     */
+    private Integer getOrderCount(LocalDateTime begin, LocalDateTime end, Integer status) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("begin", begin);
+        map.put("end", end);
+        map.put("status", status);
+
+        return orderMapper.countByMap(map);
+    }
+    }
