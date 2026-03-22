@@ -148,7 +148,7 @@ public class ReportServiceImpl implements ReportService {
             Integer orderCount = getOrderCount(beginTime, endTime, null);
 
             // 查询每天的有效订单数 (状态为已完成：5)
-            // 注意：苍穹外卖中通常统一定义了常量 Orders.COMPLETED
+            // 苍穹外卖中通常统一定义了常量 Orders.COMPLETED
             Integer validOrderCount = getOrderCount(beginTime, endTime, Orders.COMPLETED);
 
             orderCountList.add(orderCount);
@@ -156,7 +156,7 @@ public class ReportServiceImpl implements ReportService {
         }
 
         // 3. 计算时间区间内的总订单数量、总有效订单数量
-        // 这里用到你之前熟悉的 Java 8 Stream 流的高级玩法：reduce(求和)
+        //  Java 8 Stream 流的高级玩法：reduce(求和)
         Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).orElse(0);
         Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).orElse(0);
 
@@ -205,7 +205,7 @@ public class ReportServiceImpl implements ReportService {
             numbers.add(goodsSalesDTO.getNumber());
         }
 
-        // 也可以用 Stream 流一行搞定（如果你喜欢高级写法）：
+        // 也可以用 Stream 流一行搞定：
         // List<String> names = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
         // List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
 
